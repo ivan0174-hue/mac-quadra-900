@@ -1,0 +1,15 @@
+# QuadraPi - configurazione del Raspberry Pi 4
+arm_64bit=1
+kernel_address=0x80000
+armstub=armstub8-rpi4.bin
+kernel=kernel8-rpi4.img
+initial_turbo=0
+
+# Uscita HDMI con audio, senza bordi neri
+hdmi_drive=2
+disable_overscan=1
+
+# Se lo schermo resta nero, togli il "#" dalle due righe seguenti
+#hdmi_force_hotplug=1
+#hdmi_group=2
+#hdmi_mode=82

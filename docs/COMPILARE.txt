@@ -1,0 +1,54 @@
+QuadraPi - come ricompilare
+===========================
+
+Contenuto
+  src/        piattaforma QuadraPi (kernel Circle, video, audio, input,
+              dischi, menu F12, orologio, preferenze)
+  basilisk/   nucleo di Basilisk II (da github.com/kanjitalk755/macemu,
+              commit f532be3d) con le modifiche descritte sotto
+  Makefile
+
+Requisiti
+  - Arm GNU Toolchain 13.3.rel1, aarch64-none-elf
+  - circle-stdlib (github.com/smuehlst/circle-stdlib, Circle Step 51.1)
+
+1) Preparare circle-stdlib
+     git clone --recursive https://github.com/smuehlst/circle-stdlib.git
+     cd circle-stdlib
+     # attiva il "fast seek" di FatFs (accesso veloce alle immagini disco):
+     sed -i 's/#define FF_USE_FASTSEEK\t0/#define FF_USE_FASTSEEK\t1/' \
+         libs/circle/addon/fatfs/ffconf.h
+     ./configure -r 4 -p aarch64-none-elf- --kernel-max-size 32 \
+         -o ARM_ALLOW_MULTI_CORE -o KERNEL_STACK_SIZE=0x100000
+     make
+
+2) Compilare QuadraPi
+     make STDLIBHOME=/percorso/di/circle-stdlib
+   Risultato: kernel8-rpi4.img
+
+   Per provarlo in QEMU (raspi3b) configura circle-stdlib con -r 3 e usa
+     make STDLIBHOME=... TARGET=kernel8
+     qemu-system-aarch64 -M raspi3b -kernel kernel8.img \
+         -drive file=sd.img,if=sd,format=raw -serial stdio \
+         -usb -device usb-kbd -device usb-mouse
+
+Modifiche al nucleo di Basilisk II
+  - uae_cpu/memory.h: indirizzamento diretto con controllo dei limiti
+    (gli accessi fuori da RAM/ROM/video leggono 0 e le scritture sono
+    ignorate, invece di causare un'eccezione bare metal)
+  - uae_cpu/newcpu.cpp: durante l'istruzione STOP continua a servire i
+    timer (non ci sono thread)
+  - uae_cpu/cpuemu.cpp, cpustbl.cpp, cpudefs.cpp, cputbl.h: generati con
+    gencpu senza le ottimizzazioni dei flag x86
+  - emul_op.cpp: le scritture del Mac sull'orologio (RTC) aggiornano
+    l'ora salvata sulla scheda SD
+  - cdrom.cpp: monta anche immagini HFS senza mappa delle partizioni
+  - prefs.cpp: accetta file di impostazioni con fine riga Windows (CR/LF)
+
+Architettura
+  core 0  Circle (USB, SD, audio) + CPU 68040 interpretata; i servizi
+          (60 Hz, input, audio, limitatore di velocità, menu) girano ogni
+          1000 istruzioni emulate (USE_CPU_EMUL_SERVICES)
+  core 1  aggiorna lo schermo HDMI ~60 volte al secondo convertendo solo
+          le righe cambiate del framebuffer del Mac (1-32 bit), con
+          ingrandimento intero, e disegna il menu

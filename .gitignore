@@ -1,0 +1,14 @@
+*.o
+*.d
+*.elf
+*.lst
+*.map
+/kernel8-rpi4.img
+/kernel8.img
+build-pi3/
+*.rom
+*.ROM
+sd*.img
+mon.sock
+serial.log
+qemu.log

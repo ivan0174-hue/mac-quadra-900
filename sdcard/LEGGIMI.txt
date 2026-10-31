@@ -1,0 +1,148 @@
+QuadraPi - Macintosh Quadra 900 "bare metal" per Raspberry Pi 4
+================================================================
+
+QuadraPi trasforma un Raspberry Pi 4 (o Pi 400) in un Macintosh Quadra 900
+(68040 con FPU). Non c'è Linux: il Pi si accende direttamente nel Mac in pochi
+secondi. Il motore di emulazione è Basilisk II, portato sulla libreria
+bare metal Circle.
+
+
+1. PREPARARE LA SCHEDA SD
+-------------------------
+- Usa una scheda microSD formattata FAT32 (le schede fino a 32 GB vanno
+  già bene; per quelle più grandi formattale in FAT32, non exFAT).
+- Copia TUTTO il contenuto di questa cartella nella radice della scheda:
+  config.txt, start4.elf, fixup4.dat, armstub8-rpi4.bin, kernel8-rpi4.img,
+  i file .dtb e la cartella "quadra".
+- Copia la ROM del tuo Macintosh nella cartella quadra (es. quadra/Quad900.ROM).
+  Va bene qualunque ROM 68k da 1 MB con estensione .rom. La ROM è di Apple
+  e non è inclusa: va estratta da una macchina di tua proprietà.
+- Copia anche il firmware del Raspberry Pi 4 (start4.elf, fixup4.dat,
+  bcm2711-rpi-4-b.dtb, armstub8-rpi4.bin): vedi il README del progetto.
+
+Collega monitor HDMI (porta HDMI0, quella vicino all'alimentazione),
+tastiera e mouse USB, poi accendi.
+
+
+2. IL DISCO DI SISTEMA
+----------------------
+Senza un disco di sistema il Mac mostra il dischetto con il punto
+interrogativo: è normale.
+
+- Copia un'immagine di disco rigido con System 7.x / Mac OS 7.5.5 / 7.6 /
+  8.0 / 8.1 nella cartella quadra/hd (ad esempio System753.img).
+  System 7.5.3 è stato distribuito gratuitamente da Apple.
+- Premi F12, scegli "Disco rigido 1", seleziona il file e poi
+  "Applica e riavvia".
+- Per installare il sistema da zero: crea un disco vuoto dal menu
+  ("Crea nuova immagine disco..."), metti l'immagine del CD di
+  installazione in quadra/cd e caricala nel CD-ROM dal menu.
+
+
+3. IL MENU (tasto F12)
+----------------------
+Con F12 l'emulazione si mette in pausa e appare il menu.
+  Frecce su/giù     scegli la voce
+  Frecce sx/dx      cambia il valore
+  Invio             apri / conferma
+  Esc o F12         torna al Mac
+  (funziona anche col mouse: movimento, rotella, clic sinistro = Invio,
+   clic destro = Esc)
+
+Voci:
+  Disco rigido 1-4    immagini dei dischi rigidi (al riavvio).
+                      Si possono anche creare immagini vuote da 20 MB a 2 GB.
+  Floppy 1-2          inserisci un'immagine di dischetto SUBITO, a Mac acceso.
+  CD-ROM              inserisci un'immagine di CD SUBITO.
+                      Per espellere usa il Mac (trascina l'icona nel Cestino
+                      o Comando-E); il menu permette anche l'espulsione forzata.
+  Memoria RAM         da 8 a 512 MB (al riavvio). Il Quadra 900 originale
+                      arrivava a 256 MB.
+  Velocità CPU        25 MHz (come l'originale), 33, 40, 50, 66, 100 MHz
+                      o Massima. Si applica subito. I MHz sono indicativi
+                      (circa 0,7 milioni di istruzioni al secondo per MHz).
+  Audio               attiva / disattiva il suono.
+  Uscita audio        HDMI oppure jack da 3,5 mm.
+  Volume              0-100%.
+  Risoluzione Mac     512x384 ... 1600x1200 (al riavvio). L'immagine viene
+                      ingrandita a multipli interi per riempire lo schermo.
+                      Le risoluzioni più piccole si possono scegliere anche
+                      dal pannello "Monitor" del Mac.
+  Colori all'avvio    bianco e nero ... milioni di colori (al riavvio;
+                      si possono cambiare anche dal pannello "Monitor").
+  Velocità mouse      25%-400%.
+  Tasto Alt sinistro  Comando (default) oppure Opzione.
+  Data e ora          il Pi non ha l'orologio: l'ora viene salvata sulla SD.
+                      Regolala dal pannello "Data e ora" del Mac (viene
+                      ricordata) oppure qui con sx/dx (un'ora alla volta).
+  Azzera PRAM         riporta la PRAM ai valori iniziali (al riavvio).
+  Applica e riavvia   salva e riavvia il Raspberry Pi.
+
+In basso il menu mostra la frequenza e la temperatura del Pi e la velocità
+del 68040 emulato.
+
+
+4. TASTIERA
+-----------
+I tasti vengono passati al Mac "per posizione": per la tastiera italiana
+scegli il layout "Italiano" nel pannello "Tastiera" del Mac (se il tuo
+System non lo contiene, serve la versione italiana del sistema).
+  Alt sinistro    = Comando (mela)
+  Windows / AltGr = Opzione  (per @ # [ ] ecc. sul layout italiano)
+  Ctrl            = Control
+  Ins             = Help,  Stamp/BlocScorr/Pausa = F13/F14/F15
+La rotella del mouse invia frecce su/giù (System 7 non gestisce la rotella).
+
+
+5. CARTELLE SULLA SCHEDA SD
+---------------------------
+  quadra/quadra.cfg   impostazioni (testo, modificabile anche dal PC)
+  quadra/hd/          immagini dei dischi rigidi
+  quadra/floppy/      immagini dei floppy
+  quadra/cd/          immagini dei CD-ROM (.iso/.toast/.cdr con dati HFS)
+  quadra/shared/      cartella condivisa: sul Mac appare il disco
+                      "Condivisa", utile per scambiare file con il PC
+  quadra/xpram.dat    PRAM del Mac
+  quadra/clock.dat    data e ora salvate
+
+Il file browser del menu mostra anche una chiavetta USB, se collegata.
+
+Formati: immagini "raw" (.img .hfv .dsk), anche con intestazione DiskCopy
+4.2 da 400K/800K. Le immagini compresse (.dmg, .sit) vanno prima convertite.
+
+
+6. SPEGNERE
+-----------
+Spegni sempre dal Mac (menu Speciale > Spegni): QuadraPi salva tutto e
+mostra "Ora puoi scollegare l'alimentazione". I dati dei dischi vengono
+comunque scritti sulla SD ogni 2 secondi.
+
+
+7. RISOLUZIONE DEI PROBLEMI
+---------------------------
+- Schermo nero: in config.txt togli il # dalle righe hdmi_force_hotplug,
+  hdmi_group e hdmi_mode. Usa la porta HDMI0.
+- Per forzare la risoluzione del Pi aggiungi in cmdline.txt (una sola
+  riga), per esempio:  width=1280 height=720
+- In caso di errore all'avvio compare una schermata rossa con la causa e
+  le ultime righe del log. Il log completo esce anche sulla seriale
+  (GPIO 14/15, 115200 baud).
+- Nessun suono via HDMI: alcuni monitor non hanno altoparlanti; prova
+  "Uscita audio: Jack 3,5 mm".
+
+
+8. LIMITI NOTI
+--------------
+- Emulazione di alto livello (Basilisk II): niente rete, porte seriali,
+  SCSI reale, AppleTalk.
+- I software che accedono direttamente all'hardware del Quadra (alcuni
+  giochi, programmi di diagnostica) possono non funzionare.
+- Il 68040 è interpretato (senza JIT).
+- Testato con una ROM da 1 MB con checksum ECBBC41C (la ROM "universale"
+  del 1992, famiglia LC III, che contiene anche il supporto per il
+  Quadra 900). Il Mac si presenta comunque come Quadra 900 (Gestalt).
+
+
+Licenze: QuadraPi è software libero (GNU GPL v3); contiene Basilisk II
+(GPL v2 o successiva) e Circle (GPL v3). Il firmware del Raspberry Pi è di Broadcom
+(LICENCE.broadcom). I sorgenti sono su https://github.com/ivan0174-hue/mac-quadra-900

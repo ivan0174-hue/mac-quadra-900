@@ -1,0 +1,1 @@
+Metti qui le immagini dei floppy (.img .dsk .image, 400K/800K/1,44MB).
