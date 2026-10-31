@@ -72,11 +72,10 @@ tools/      script per le prove in QEMU
 
 ## Stato
 
-- **Provato in QEMU** (variante Pi 3): avvio di System 7.5.3, tastiera, mouse,
-  menu, floppy e CD a caldo, creazione e inizializzazione di dischi,
+- **Funziona su hardware reale**: Raspberry Pi 4.
+- **Provato anche in QEMU** (variante Pi 3): avvio di System 7.5.3, tastiera,
+  mouse, menu, floppy e CD a caldo, creazione e inizializzazione di dischi,
   cambio della RAM con riavvio, spegnimento.
-- **Da provare su un Raspberry Pi 4 vero**: USB (xHCI), audio HDMI e jack,
-  velocità reale.
 - **Limiti**: emulazione di alto livello (niente rete, seriali, SCSI reale);
   il 68040 è interpretato, senza JIT.
 
